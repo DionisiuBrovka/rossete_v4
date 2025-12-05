@@ -2,37 +2,15 @@ import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:rossete_v4/forms/umk_create_form/umk_create_form_controller.dart';
 
-class UMKCreateForm extends StatefulWidget {
+class UMKCreateForm extends StatelessWidget {
   const UMKCreateForm({super.key, required this.formController});
 
   final UMKCreateFormController formController;
 
   @override
-  State<UMKCreateForm> createState() => _UMKCreateFormState();
-}
-
-class _UMKCreateFormState extends State<UMKCreateForm> {
-  late final TextEditingController keyController;
-  late final TextEditingController dirController;
-  late final TextEditingController nameController;
-  late final TextEditingController shortNameController;
-  late final TextEditingController descController;
-
-  @override
-  void initState() {
-    keyController = TextEditingController();
-    dirController = TextEditingController();
-    nameController = TextEditingController();
-    shortNameController = TextEditingController();
-    descController = TextEditingController();
-
-    super.initState();
-  }
-
-  @override
   Widget build(BuildContext context) {
     return Form(
-      key: widget.formController.formKey,
+      key: formController.formKey,
       child: Column(
         mainAxisSize: .min,
         mainAxisAlignment: .center,
@@ -40,23 +18,15 @@ class _UMKCreateFormState extends State<UMKCreateForm> {
         spacing: 16,
         children: [
           _DirectoryField(),
-          _KeyField(keyController: keyController),
-          _NameField(nameController: nameController),
-          _ShortNameField(shortNameController: shortNameController),
-          _DescField(descController: descController),
+          _KeyField(keyController: formController.keyController),
+          _NameField(nameController: formController.nameController),
+          _ShortNameField(
+            shortNameController: formController.shortNameController,
+          ),
+          _DescField(descController: formController.descController),
         ],
       ),
     );
-  }
-
-  @override
-  void dispose() {
-    keyController.dispose();
-    dirController.dispose();
-    nameController.dispose();
-    shortNameController.dispose();
-    descController.dispose();
-    super.dispose();
   }
 }
 
@@ -69,12 +39,19 @@ class _DescField extends StatelessWidget {
   Widget build(BuildContext context) {
     return TextFormField(
       controller: descController,
-      minLines: 15,
+      minLines: 5,
       maxLines: 35,
       decoration: InputDecoration(
         label: Text("Описание предмета"),
         alignLabelWithHint: true,
       ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return "Поле должно быть заполнено";
+        }
+
+        return null;
+      },
     );
   }
 }
@@ -87,11 +64,17 @@ class _DirectoryField extends FormField<String> {
     this.buttonLabel = 'Выбрать',
     this.icon = Icons.folder,
     super.onSaved,
-    super.validator,
     this.onChanged,
     AutovalidateMode super.autovalidateMode = AutovalidateMode.disabled,
   }) : super(
          initialValue: initialValue ?? '',
+         validator: (value) {
+           if (value == null || value.isEmpty) {
+             return "Выберите папку для УМК";
+           }
+
+           return null;
+         },
          builder: (FormFieldState<String> state) {
            Future<void> pickDirectory(BuildContext context) async {
              try {
@@ -191,6 +174,17 @@ class _ShortNameField extends StatelessWidget {
         label: Text("Краткое название"),
         suffixIcon: Icon(Icons.label_important_rounded),
       ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return "Поле должно быть заполнено";
+        }
+
+        if (value.length >= 8) {
+          return "Короткое название должно быть короче 8 символов";
+        }
+
+        return null;
+      },
     );
   }
 }
@@ -209,6 +203,17 @@ class _NameField extends StatelessWidget {
         label: Text("Название"),
         suffixIcon: Icon(Icons.text_fields),
       ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return "Поле должно быть заполнено";
+        }
+
+        if (value.length <= 8) {
+          return "Название предмета должно быть длинее 8 символов";
+        }
+
+        return null;
+      },
     );
   }
 }
@@ -228,6 +233,13 @@ class _KeyField extends StatelessWidget {
         label: Text("API ключ"),
         suffixIcon: Icon(Icons.key),
       ),
+      validator: (value) {
+        if (value == null || value.isEmpty) {
+          return "Поле должно быть заполнено";
+        }
+
+        return null;
+      },
     );
   }
 }
