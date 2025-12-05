@@ -24,10 +24,7 @@ abstract class Task with ChangeNotifier {
     notifyListeners();
 
     try {
-      final subTasks = await _taskFunction();
-      if (subTasks != null) {
-        subTasks.execute();
-      }
+      await _taskFunction();
       status = TaskStatus.completed;
       notifyListeners();
     } catch (e) {
@@ -37,34 +34,15 @@ abstract class Task with ChangeNotifier {
     }
   }
 
-  Future<CompositeTask?> _taskFunction();
-}
-
-class CompositeTask extends Task {
-  final List<Task> subTasks;
-
-  CompositeTask({required super.name, this.subTasks = const []});
-
-  @override
-  Future<CompositeTask?> _taskFunction() async {
-    for (var task in subTasks) {
-      await task.execute();
-
-      if (task.status == TaskStatus.failed) {
-        throw Exception('Subtask ${task.name} failed');
-      }
-    }
-    return null;
-  }
+  Future<void> _taskFunction();
 }
 
 class PlaceholderTask extends Task {
   PlaceholderTask({super.name = "Тестовая задача", super.status = .pending});
 
   @override
-  Future<CompositeTask?> _taskFunction() async {
+  Future<void> _taskFunction() async {
     await Future.delayed(Duration(seconds: 1));
-    return null;
   }
 
   Future<void> executeWithErrors() async {
