@@ -1,3 +1,4 @@
+import 'package:file_picker/file_picker.dart';
 import 'package:flutter/material.dart';
 import 'package:rossete_v4/forms/umk_create_form/u_m_k_create_form_controller.dart';
 
@@ -42,15 +43,7 @@ class _UMKCreateFormState extends State<UMKCreateForm> {
           _KeyField(keyController: keyController),
           _NameField(nameController: nameController),
           _ShortNameField(shortNameController: shortNameController),
-          TextFormField(
-            controller: descController,
-            minLines: 15,
-            maxLines: 35,
-            decoration: InputDecoration(
-              label: Text("Описание предмета"),
-              alignLabelWithHint: true,
-            ),
-          ),
+          _DescField(descController: descController),
         ],
       ),
     );
@@ -67,50 +60,121 @@ class _UMKCreateFormState extends State<UMKCreateForm> {
   }
 }
 
+class _DescField extends StatelessWidget {
+  const _DescField({required this.descController});
+
+  final TextEditingController descController;
+
+  @override
+  Widget build(BuildContext context) {
+    return TextFormField(
+      controller: descController,
+      minLines: 15,
+      maxLines: 35,
+      decoration: InputDecoration(
+        label: Text("Описание предмета"),
+        alignLabelWithHint: true,
+      ),
+    );
+  }
+}
+
 class _DirectoryField extends FormField<String> {
   _DirectoryField({
-    Key? key,
+    super.key,
     String? initialValue,
-    FormFieldSetter<String>? onSaved,
-    FormFieldValidator<String>? validator,
-    AutovalidateMode autovalidateMode = AutovalidateMode.disabled,
+    this.label = 'Выберите папку для УМК',
+    this.buttonLabel = 'Выбрать',
+    this.icon = Icons.folder,
+    super.onSaved,
+    super.validator,
+    this.onChanged,
+    AutovalidateMode super.autovalidateMode = AutovalidateMode.disabled,
   }) : super(
-         key: key,
-         initialValue: initialValue,
-         onSaved: onSaved,
-         validator: validator,
-         autovalidateMode: autovalidateMode,
+         initialValue: initialValue ?? '',
          builder: (FormFieldState<String> state) {
-           return Builder(
-             builder: (context) {
-               return Container(
+           Future<void> pickDirectory(BuildContext context) async {
+             try {
+               final String? selected = await FilePicker.platform
+                   .getDirectoryPath();
+
+               if (selected != null) {
+                 state.didChange(selected);
+               } else {
+                 state.didChange(null);
+               }
+
+               if (onChanged != null) {
+                 onChanged(selected);
+               }
+             } catch (e) {
+               // ignore: use_build_context_synchronously
+               ScaffoldMessenger.of(context).showSnackBar(
+                 SnackBar(content: Text('Ошибка при выборе папки: $e')),
+               );
+             }
+           }
+
+           final theme = Theme.of(state.context);
+           final value = state.value ?? '';
+
+           return Column(
+             crossAxisAlignment: CrossAxisAlignment.stretch,
+             children: [
+               Container(
                  decoration: BoxDecoration(
-                   border: Border.all(
-                     color: Theme.of(context).colorScheme.outline,
-                   ),
+                   border: Border.all(color: theme.colorScheme.outline),
                    borderRadius: BorderRadius.circular(22),
-                   color: Theme.of(context).colorScheme.surfaceContainerLow,
-                   boxShadow: [BoxShadow(blurRadius: 4, color: Colors.black12)],
+                   color: theme.colorScheme.surfaceContainerLow,
+                   boxShadow: const [
+                     BoxShadow(blurRadius: 4, color: Colors.black12),
+                   ],
                  ),
                  child: Padding(
-                   padding: const EdgeInsets.fromLTRB(16, 4, 4, 4),
+                   padding: const EdgeInsets.fromLTRB(16, 12, 12, 12),
                    child: Row(
                      children: [
-                       Text("Выберите папку для УМК"),
-                       Spacer(),
+                       Expanded(
+                         child: Text(
+                           value.isNotEmpty ? value : label,
+                           style: value.isNotEmpty
+                               ? theme.textTheme.bodyMedium
+                               : theme.textTheme.bodyMedium?.copyWith(
+                                   color: theme.textTheme.bodyMedium!.color
+                                       ?.withAlpha(100),
+                                 ),
+                           overflow: TextOverflow.ellipsis,
+                         ),
+                       ),
+                       const SizedBox(width: 8),
                        FilledButton.icon(
-                         onPressed: () {},
-                         label: Text("выбрать"),
-                         icon: Icon(Icons.folder),
+                         onPressed: () => pickDirectory(state.context),
+                         icon: Icon(icon),
+                         label: Text(buttonLabel),
                        ),
                      ],
                    ),
                  ),
-               );
-             },
+               ),
+               if (state.hasError)
+                 Padding(
+                   padding: const EdgeInsets.only(top: 6, left: 8),
+                   child: Text(
+                     state.errorText ?? '',
+                     style: theme.textTheme.bodySmall?.copyWith(
+                       color: theme.colorScheme.error,
+                     ),
+                   ),
+                 ),
+             ],
            );
          },
        );
+
+  final String label;
+  final String buttonLabel;
+  final IconData icon;
+  final ValueChanged<String?>? onChanged;
 }
 
 class _ShortNameField extends StatelessWidget {
