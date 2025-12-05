@@ -8,7 +8,10 @@ class TasksComposer with ChangeNotifier {
 
   final List<Task> tasks;
 
-  TasksComposer({required this.tasks});
+  final Future<void> Function()? onComplete;
+  final Future<void> Function()? onFail;
+
+  TasksComposer({required this.tasks, this.onComplete, this.onFail});
 
   Future<void> procces() async {
     status = .inProgress;
@@ -21,6 +24,11 @@ class TasksComposer with ChangeNotifier {
     if (tasks.every((element) => element.status == .completed ? true : false)) {
       status = .completed;
       notifyListeners();
+
+      if (onComplete != null) {
+        await onComplete!();
+      }
+
       return;
     }
 
@@ -29,6 +37,11 @@ class TasksComposer with ChangeNotifier {
         .isNotEmpty) {
       status = .failed;
       notifyListeners();
+
+      if (onFail != null) {
+        await onFail!();
+      }
+
       return;
     }
 
