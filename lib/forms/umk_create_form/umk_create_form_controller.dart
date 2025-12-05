@@ -32,12 +32,12 @@ class UMKCreateFormController with ChangeNotifier {
   }
 
   Future<void> submitForm({
-    Future<void> Function(UMKCreateFormData data)? onSuccses,
+    Future<void> Function(UMKCreateFormData data)? onSuccess,
   }) async {
     if (formKey.currentState!.validate()) {
       log("форма валидна", name: "UMK_CREATE_FORM_CONTROLLER");
-      if (onSuccses != null) {
-        await onSuccses(
+      if (onSuccess != null) {
+        await onSuccess(
           UMKCreateFormData(
             apiKey: keyController.text,
             directory: dirController.text,

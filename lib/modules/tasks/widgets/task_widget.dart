@@ -11,17 +11,37 @@ class TaskWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return ListenableBuilder(
       listenable: task,
-      builder: (context, child) => Row(
-        children: [
-          Text(task.name),
-          Spacer(),
-          switch (task.status) {
-            .pending => Icon(Icons.more_horiz),
-            .inProgress => CircularProgressIndicator(strokeAlign: -4),
-            .completed => Icon(Icons.check),
-            .failed => Icon(Icons.close),
-          },
-        ],
+      builder: (context, child) => SizedBox(
+        height: 24,
+        child: Row(
+          children: [
+            Text(
+              task.name,
+              style: TextStyle(
+                fontFamily: "Cascadia Code",
+                height: 0.75,
+                color: switch (task.status) {
+                  .pending => Colors.grey,
+                  .inProgress => Colors.white,
+                  .failed => Colors.redAccent,
+                  .completed => Colors.greenAccent,
+                },
+              ),
+            ),
+            Spacer(),
+            switch (task.status) {
+              .pending => Center(),
+              .inProgress => CircularProgressIndicator(
+                color: Colors.white,
+                strokeAlign: -1,
+                padding: .only(right: 4),
+                constraints: .tight(Size(18, 18)),
+              ),
+              .completed => Icon(Icons.check, color: Colors.greenAccent),
+              .failed => Icon(Icons.close, color: Colors.redAccent),
+            },
+          ],
+        ),
       ),
     );
   }

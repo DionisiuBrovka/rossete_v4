@@ -1,4 +1,5 @@
 import 'dart:developer';
+import 'dart:math' as mt;
 
 import 'package:flutter/foundation.dart';
 
@@ -11,7 +12,8 @@ abstract class Task with ChangeNotifier {
   TaskStatus status;
 
   static String _generateId() {
-    return DateTime.now().millisecondsSinceEpoch.toString();
+    final rnd = mt.Random();
+    return rnd.nextInt(999999).toString();
   }
 
   Task({required this.name, this.status = TaskStatus.pending})
