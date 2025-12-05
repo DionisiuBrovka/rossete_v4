@@ -29,25 +29,35 @@ class TaskWidget extends StatelessWidget {
 
 @Preview()
 Widget previewInAction() {
-  return TaskWidget(task: PlaceholderTask(status: .pending)..execute());
+  return Card.outlined(
+    child: TaskWidget(task: PlaceholderTask(status: .pending)..execute()),
+  );
 }
 
 @Preview()
 Widget previewPending() {
-  return TaskWidget(task: PlaceholderTask(status: .pending));
+  return Card.outlined(
+    child: TaskWidget(task: PlaceholderTask(status: .pending)),
+  );
 }
 
 @Preview()
 Widget previewInProgress() {
-  return TaskWidget(task: PlaceholderTask(status: .inProgress));
+  return Card.outlined(
+    child: TaskWidget(task: PlaceholderTask(status: .inProgress)),
+  );
 }
 
 @Preview()
 Widget previewCompleted() {
-  return TaskWidget(task: PlaceholderTask(status: .completed));
+  return Card.outlined(
+    child: TaskWidget(task: PlaceholderTask(status: .completed)),
+  );
 }
 
 @Preview()
 Widget previewFailed() {
-  return TaskWidget(task: PlaceholderTask(status: .failed));
+  return Card.outlined(
+    child: TaskWidget(task: PlaceholderTask(status: .failed)),
+  );
 }
