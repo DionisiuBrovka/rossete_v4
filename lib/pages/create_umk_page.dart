@@ -1,11 +1,13 @@
 import 'dart:developer';
 
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:rossete_v4/forms/umk_create_form/umk_create_form.dart';
 import 'package:rossete_v4/forms/umk_create_form/umk_create_form_controller.dart';
 import 'package:rossete_v4/modules/tasks/task.dart';
 import 'package:rossete_v4/modules/tasks/tasks_composer.dart';
 import 'package:rossete_v4/modules/tasks/widgets/task_composer_widget.dart';
+import 'package:rossete_v4/pages/main_page.dart';
 
 enum CreateUMKPageStatus { formEditing, process }
 
@@ -20,6 +22,7 @@ class _CreateUMKPageState extends State<CreateUMKPage> {
   CreateUMKPageStatus status = CreateUMKPageStatus.formEditing;
 
   late final UMKCreateFormController formController;
+
   final TasksComposer composer = TasksComposer(
     tasks: [
       PlaceholderTask(),
@@ -27,6 +30,10 @@ class _CreateUMKPageState extends State<CreateUMKPage> {
       PlaceholderTask(),
       PlaceholderTask(),
     ],
+    onComplete: () => Navigator.pushReplacement(
+      GetIt.I<GlobalKey<NavigatorState>>().currentState!.context,
+      MaterialPageRoute(builder: (context) => MainPage()),
+    ),
   );
 
   Future<void> onFormSubmitSuccess(UMKCreateFormData data) async {
